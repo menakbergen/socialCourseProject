@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block content %}
+<style>
+    ul {
+        display: none;
+    }
+    label {
+        display: none;
+    }
+    form input {
+        padding: 10px;
+        margin: 0;
+        border: 1px solid #dbdbdb;
+        border-radius: 3px;
+        background-color: #fafafa;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .ui.vertical.menu {
+        display: none;
+    }
+    footer {
+        margin-top: 393px;
+        padding: 20px;
+        text-align: center;
+    }
+    footer p {
+        margin-top: 20px;
+        font-size: 13px;
+    }
+</style>
+    {% setvar link %}
+        <a href="{{ login_url }}">
+        {% endsetvar %}
+        {% setvar end_link %}
+        </a>
+    {% endsetvar %}
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="login-box" style="background-color: #fff; border: 1px solid #dbdbdb; padding: 20px; margin: 10px 0; width: 350px; text-align: center;">
+    <h1>{% trans "Регистрация" %}</h1>
+    {% if not SOCIALACCOUNT_ONLY %}
+        {% url 'account_signup' as action_url %}
+        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
+            {% slot body %}
+                {% csrf_token %}
+                {% element fields form=form unlabeled=True %}
+                {% endelement %}
+                {{ redirect_field }}
+            {% endslot %}
+            {% slot actions %}
+            <button type="submit" class="ui primary button">{% trans "Регистрация" %}</button>
+            {% endslot %}
+        {% endelement %}
+    {% endif %}
+    </div>
+</div>
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="login-box" style="background-color: #fff; border: 1px solid #dbdbdb; padding: 20px; margin: 10px 0; width: 350px; text-align: center;">
+        <p>Есть аккаунт? {{ link }}Вход{{ end_link }}</p>
+    </div>
+    {% if SOCIALACCOUNT_ENABLED %}
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+    <footer>
+        <p>POSTGRAM &copy; 2024</p>
+    </footer>
+</div>
+{% endblock content %}

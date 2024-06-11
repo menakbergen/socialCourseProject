@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Log Out" %}
+{% endblock head_title %}
+{% block content %}
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="login-box" style="background-color: #fff; border: 1px solid #dbdbdb; padding: 20px; margin: 10px 0; width: 350px; text-align: center;">
+        <h1>{% trans "Выход" %}</h1>
+        <p>{% trans 'Вы уверены, что хотите выйти?' %}</p>
+        <button id="openModalButton" class="ui red button">{% trans 'Выйти' %}</button>
+    </div>
+</div>
+
+<!-- Modal Structure -->
+<div class="ui modal" id="logoutModal" style="top: 40%; position: absolute;">
+    <div class="header">{% trans "Выход" %}</div>
+    <div class="content">
+        <p>{% trans 'Вы уверены, что хотите выйти?' %}</p>
+        {% url 'account_logout' as action_url %}
+        <form method="post" action="{{ action_url }}" class="ui form">
+            {% csrf_token %}
+            {{ redirect_field }}
+            <button type="submit" class="ui red button">{% trans 'Выйти' %}</button>
+            <button type="button" id="cancelButton" class="ui blue button">{% trans 'Отменить' %}</button>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // Initialize the modal
+        $('#logoutModal').modal({
+            blurring: true
+        });
+
+        // Show the modal when the button is clicked
+        $('#openModalButton').click(function() {
+            $('#logoutModal').modal('show');
+        });
+
+        var cancelButton = document.getElementById('cancelButton');
+        cancelButton.addEventListener('click', function () {
+            $('#logoutModal').modal('hide');
+        });
+    });
+</script>
+{% endblock content %}
+

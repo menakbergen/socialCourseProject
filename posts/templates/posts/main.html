@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+<style>
+    .fixed-right {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 17rem;
+        z-index: 99;
+    }
+    .centered-container {
+        /* display: flex; */
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+    #id_content {
+        width: 100%;
+        height: 150px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: vertical;
+    }
+    ul.messages li.success {
+        display: none;
+    }
+    label {
+        display: none;
+    }
+    #id_remember {
+        display: none;
+    }
+    .info {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .messages {
+        padding: 20px;
+        border: 2px solid #ddd;
+    }
+</style>
+<br>
+<br>
+<div class="ui grid">
+    <div class="centered-container">
+    <div class="eleven wide column">
+        <!-- style="margin-left: 100px;"> -->
+        {% if messages %}
+        <div class="ui fluid card">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul> 
+            </div>
+        {% endif %}
+        {% for obj in qs %}
+        <div class="ui fluid card">
+            <div class="content">
+                <div class="right floated meta">
+                <div class="ui grid">
+                    <div class="row">
+                        {% if request.user == obj.author.user %}
+                            <a href="{% url 'posts:post-update' obj.pk %}"><button class="ui button bwhite-lg">Обновить</button></a>
+                            <a href="{% url 'posts:post-delete' obj.pk %}"><button class="ui button bwhite-lg">Удалить</button></a>
+                        {% endif %}
+                    </div>
+                </div>   
+                </div>
+                <img class="ui avatar image" src="{{ obj.author.avatar.url }}"> 
+                {{ obj.author.user }} - {{ obj.created|timesince }} ago
+            </div>
+            <div class="ui fluid image">
+                {% if obj.image %}
+                    <img src={{obj.image.url}}>
+                {% endif %}
+            </div>
+            <div class="content">
+                <p>@{{ obj.author.user }}: {{ obj.content }}</p>
+                <div class="right floated">
+                    <form action="{% url 'posts:like-post-view' %}" method="POST" class="like-form" id="{{obj.id}}">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value={{obj.id}}>
+                            <button type="submit" class="ui primary button like-btn{{obj.id}}">
+                                {% if profile not in obj.liked.all %}
+                                    <i class="thumbs up icon"></i>&nbsp;Like
+                                {% else %}
+                                    <i class="thumbs down icon"></i>&nbsp;Unlike
+                                {% endif %}    
+                            </button>
+                            <span class="like-count{{ obj.id }}" style="margin-left: 1px;">{{ obj.num_likes }}</span>
+                            <span style="margin-left: 1px;">лайков</span>
+                            <!-- <div class="ui grid"> 
+                                <div class="column">
+                                    <div class="like-count{{obj.id}}"> {{ obj.num_likes }}</div>
+                                </div>
+                                <div class="column">
+                                    likes
+                                </div>
+                            </div> -->
+                    </form>
+                </div>
+                <i class="comment icon"></i>
+                <span> {{ obj.num_comments }} комментарий</span>
+            </div>
+            <div class="extra content">
+                <div class="mb-5">
+                </div>
+                <button class="cmt_btn ui button mb-5">показать / скрыть комментарии</button>
+                <div class="comment-box">
+                {% if obj.comment_set.all %}
+                    {% for c in obj.comment_set.all %}
+                        <div class="ui segment mb-5">
+                            <img class="ui avatar image" src={{c.user.avatar.url}}>
+                            <span>{{ c.user }}</span>
+                            <div class='mt-5'>{{ c.body }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                </div>
+
+                <form action="" method="POST"class='ui fluid form'>
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value={{obj.id}}>
+                    {{ c_form }}
+                    <button type="submit" name="submit_c_form" class="ui blue button mt-5 w-full">Отправить</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        </div>
+        <div class="five wide column">
+            <div class="ui segment fixed-right" style="z-index: 99; position: fixed; height: 100%; width: 17rem;">
+                <!-- <button id="openModalButton" class="ui button">+</button> -->
+                <form action="" method="POST" class="ui form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h2>Добавьте новый пост: </h2>
+                    {{ p_form }}
+                    <button type="submit" name="submit_p_form" class="ui blue button w-full mt-5">Отправить</button>
+                </form>
+                {% if post_added %}
+                    <div class="ui green message">Пост добавлен</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="ui modal" id="postModal">
+            <div class="header">Добавить пост</div>
+            <div class="content">
+            </div>
+        </div>
+{% endblock content %}
+{% block scripts %} 
+    <script>
+        $( document ).ready(function() {
+            let display = false
+            $(".cmt_btn").click(function () {
+                if (display===false) {
+                    $(this).next(".comment-box").show("slow");
+                    display=true
+                } else {
+                    $(this).next(".comment-box").hide("slow");
+                    display=false
+                }  
+            });
+
+            $('#postModal').modal({
+            blurring: true
+            });
+
+            $('#openModalButton').click(function() {
+                $('#postModal').modal('show');
+            });
+
+            $('.like-form').submit(function(e){
+                e.preventDefault()
+                
+                const post_id = $(this).attr('id')
+                
+                const likeText = $(`.like-btn${post_id}`).text()
+                const trim = $.trim(likeText)
+
+                const url = $(this).attr('action')
+                
+                let res;
+                const likes = $(`.like-count${post_id}`).text()
+                const trimCount = parseInt(likes)
+                
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id':post_id,
+                    },
+                    success: function(response) {
+                        if(trim === 'Unlike') {
+                            $(`.like-btn${post_id}`).html('<i class="thumbs up icon"></i>&nbsp;Like');
+                            res = trimCount - 1
+                        } else {
+                            $(`.like-btn${post_id}`).html('<i class="thumbs down icon"></i>&nbsp;Unlike');
+                            res = trimCount + 1
+                        }
+                        $(`.like-count${post_id}`).text(res)
+                    },
+                    error: function(response) {
+                        console.log('error', response)
+                    }
+                })
+            })
+        });
+
+    </script>
+{% endblock scripts %}

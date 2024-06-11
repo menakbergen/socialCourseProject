@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load allauth account %}
+{% block head_title %}
+    {% trans "Log In" %}
+{% endblock head_title %}
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="main.css">
+{% endblock stylesheets %}
+{% block content %}
+<style>
+    label {
+        display: none;
+    }
+    form input {
+        padding: 10px;
+        margin: 0;
+        margin-bottom: 10px;
+        border: 1px solid #dbdbdb;
+        border-radius: 3px;
+        background-color: #fafafa;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #id_remember {
+        display: none;
+    }
+    .ui.vertical.menu {
+        display: none;
+    }
+    footer {
+        margin-top: 567px;
+        padding: 20px;
+        text-align: center;
+    }
+    footer p {
+        margin-top: 20px;
+        font-size: 13px;
+    }
+</style>
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="login-box" style="background-color: #fff; border: 1px solid #dbdbdb; padding: 20px; margin: 10px 0; width: 350px; text-align: center;">
+        <h1>{% trans "Войти" %}</h1>
+        {% if not SOCIALACCOUNT_ONLY %}
+            {% setvar link %}
+                <a href="{{ signup_url }}">
+            {% endsetvar %}
+        {% setvar end_link %}
+            </a>
+        {% endsetvar %}
+        <form method="post" action="{{ login_url }}" style="display: flex; flex-direction: column;">
+            {% csrf_token %}
+                {% for field in form %}
+                    <div>
+                        {{ field.errors }}
+                        {{ field.label_tag }} {{ field }}
+                    </div>
+                {% endfor %}
+            {{ redirect_field }}
+            <button type="submit" class="ui primary button">{% trans "Войти" %}</button>
+        </form>
+    {% endif %}
+    </div>
+    <div class="signup-box">
+        <p>У вас ещё нет аккаунта? {{ link }}Зарегистрироваться{{ end_link }}</p>
+        {% url 'account_login' as login_url %}
+    </div>
+    <footer>
+        <p>POSTGRAM &copy; 2024</p>
+    </footer>
+</div>
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Update post
+{% endblock title %}
+
+{% block content %}
+<style>
+    #image-clear_id {
+        display: none;
+    }
+</style>
+<br>
+    <div class="ui segment">
+        <h3>Обновить пост</h3>
+        <form action="" method="POST" class="ui form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{form}}
+            <button type="submit" class="ui positive button mt-5">Обновить</button>
+            <a href="{% url 'posts:main-post-view' %}" class="ui blue button">Отменить</a>            
+        </form>
+    </div>
+{% endblock content %}

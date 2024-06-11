@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Delete Post
+{% endblock title %}
+
+{% block content %}
+<br>
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'warning' in message.tags %}
+                <div class="ui negative message">
+                    <div class="header">
+                        {{message}}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if not messages  %}
+        <div class="ui segment">
+            <h3>Удалить пост?</h3>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <p>Вы уверены, что хотите удалить этот пост?</p>
+                <button type='submit' class="ui red button">Подтвердить</button>
+                <a href="{% url 'posts:main-post-view' %}" class="ui secondary button">Отменить</a>            
+            </form>
+        </div>
+    {% endif %}
+{% endblock content %}

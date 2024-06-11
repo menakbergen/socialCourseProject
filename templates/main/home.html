@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}
+Home
+{% endblock title %}
+{% load static %}
+{% block content %}
+<style>
+    .ui.vertical.menu {
+        display: none;
+    }
+    body {
+        margin: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        color: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        justify-content: space-between;
+    }
+    .container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-right: 120px;
+    }
+    .logo {
+        padding: 130px;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .logo img {
+        width: 500px;
+    }
+    .content {
+        flex: 2;
+        text-align: left;
+    }
+    h1 {
+        font-size: 50px;
+        margin: 0;
+    }
+    p {
+        margin: 10px 0;
+    }
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    button {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        width: 300px;
+    }
+    .login {
+        margin-top: 20px;
+    }
+    .login p {
+        font-size: 17px;
+    }
+    .login-button {
+        background: none;
+        border: 1px solid #000;
+        color: #000;
+        padding: 10px;
+        font-weight: bold;
+    }
+    footer {
+        margin-top: 140px;
+        padding: 20px;
+        text-align: center;
+    }
+    footer p {
+        margin-top: 20px;
+        font-size: 13px;
+    }
+</style>
+<br>
+{% if request.user.is_authenticated %}
+{% else %}
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="X Logo">
+        </div>
+        <div class="content">
+            <h1>В курсе происходящего</h1>
+            <br>
+            <h2>Присоединяйтесь сегодня.</h2>
+            <div class="buttons">
+                <a href="{% url 'account_signup' %}">
+                <button class="ui blue button">Зарегистрироваться</button>
+            </a>
+            </div>
+            <div class="login">
+                <p>Уже зарегистрированы?</p>
+                <a href="{% url 'account_login' %}">
+                <button class="ui secondary basic button">Войти</button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>POSTGRAM &copy; 2024</p>
+    </footer>
+</body>
+{% endif %}
+{% endblock content %}
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script>
+$(document).ready(function(){
+    console.log('working')
+    // Слайдер скрипт
+    $('.slider').slick({
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 2000,
+    });
+})
+</script>
+{% endblock scripts %}

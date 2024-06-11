@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Log Out" %}
+{% endblock head_title %}
+{% block content %}
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="login-box" style="background-color: #fff; border: 1px solid #dbdbdb; padding: 20px; margin: 10px 0; width: 350px; text-align: center;">
+    <h1>{% trans "Log Out" %}</h1>
+    <p>{% trans 'Are you sure you want to sign out?' %}</p>
+    {% url 'account_logout' as action_url %}
+    <!-- {% element form method="post" action=action_url no_visible_fields=True %}
+    <form method="post" action="{{ action_url }}" no_visible_fields="True" style="display: flex; flex-direction: column;">
+        {% slot body %}
+            {% csrf_token %}
+            {{ redirect_field }}
+        {% endslot %}
+        {% slot actions %}
+        <button>{% trans 'Sign Out' %}</button>
+        {% endslot %}
+        </form>
+    {% endelement %} -->
+
+    <form method="post" action="{{ action_url }}" no_visible_fields="True">
+        {% csrf_token %}
+        {{ redirect_field }}
+        <button type="submit" class="ui red button">{% trans 'Log Out' %}</button>
+        <!-- <button type="submit" style="background-color: red; color: white;">Sign Out</button> -->
+    </form>
+    </div>
+</div> 
+{% endblock content %}
